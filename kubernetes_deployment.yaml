@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python
+    env: dev
+  name: flask-hello-world
+spec:
+  replicas: 2
+  progressDeadlineSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: python
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: python
+        env: dev
+    spec:
+      containers:
+      - image: singharunk/flask-hello-world:v1
+        name: flask-hello-world
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+  
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: python
+  name: flask-hello-world
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: python
+  type: ClusterIP
